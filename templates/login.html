@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+        <p id="message" style="color: red;"></p> <!-- Display error messages here -->
+        <a href="#" id="forgotPassword">Forgot Password?</a>
+    </div>
+
+    <div class="forgot-password-container" id="forgotPasswordContainer" style="display: none;">
+        <h2>Forgot Password</h2>
+        <form id="forgotPasswordForm">
+            <label for="email">Username or Email:</label>
+            <input type="text" id="email" name="email" required>
+            
+            <button type="submit">Send Code</button>
+        </form>
+    </div>
+
+    <div class="reset-password-container" id="resetPasswordContainer" style="display: none;">
+        <h2>Reset Password</h2>
+        <form id="resetPasswordForm">
+            <label for="code">Enter Code:</label>
+            <input type="text" id="code" name="code" required>
+            
+            <label for="newPassword">New Password:</label>
+            <input type="password" id="newPassword" name="newPassword" required>
+            
+            <button type="submit">Reset Password</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+
+            let response = await fetch("/admin-login", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+            });
+
+            let result = await response.json();
+
+            // Show response message
+            document.getElementById("message").innerText = result.error;
+
+            // Add red border if login is flagged
+            if (result.error) {
+                document.getElementById("username").style.border = "2px solid red";
+                document.getElementById("password").style.border = "2px solid red";
+            }
+        });
+
+        // Forgot password toggle
+        document.getElementById("forgotPassword").addEventListener("click", function(event) {
+            event.preventDefault();
+            document.getElementById("loginContainer").style.display = "none";
+            document.getElementById("forgotPasswordContainer").style.display = "block";
+        });
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
